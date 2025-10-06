@@ -22,7 +22,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            min-height: 100dvh; /* Dynamic viewport height for mobile */
+            min-height: 100dvh;
             padding: env(safe-area-inset-top, 10px) env(safe-area-inset-right, 10px) env(safe-area-inset-bottom, 10px) env(safe-area-inset-left, 10px);
             -webkit-user-select: none;
             -webkit-touch-callout: none;
@@ -40,71 +40,133 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 40px);
+            height: calc(100vh - 20px);
             min-height: 600px;
         }
 
         .header {
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             color: white;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
+            flex-shrink: 0;
         }
 
         .header h1 {
-            font-size: 2.5em;
+            font-size: 1.8em;
             font-weight: 300;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .header .subtitle {
-            font-size: 1.1em;
+            font-size: 0.9em;
             opacity: 0.8;
         }
 
         .main-content {
             display: flex;
+            flex-direction: column;
             flex: 1;
             min-height: 0;
             overflow: hidden;
+            position: relative;
         }
 
-        .sidebar {
-            width: 320px;
-            min-width: 280px;
-            max-width: 320px;
+        /* =========================
+           MOBILE-FIRST LAYOUT
+           ========================= */
+
+        /* Mobile: Toggle button for master activities */
+        .mobile-sidebar-toggle {
+            position: fixed;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            z-index: 1001;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-sidebar-toggle:active {
+            transform: translateY(-50%) scale(0.95);
+            background: #5a6fd8;
+        }
+
+        .mobile-sidebar-toggle.open {
+            left: 260px;
+            background: #dc3545;
+        }
+
+        /* Mobile: Slide-out master activities sidebar */
+        .master-activities {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100vh;
             background: #f8f9fa;
-            border-right: 1px solid #e9ecef;
-            padding: 15px;
+            z-index: 1000;
+            transition: left 0.3s ease;
             overflow-y: auto;
+            overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
-            flex-shrink: 0;
+            padding: 80px 15px 15px 15px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .master-activities.open {
+            left: 0;
+        }
+
+        /* Mobile: Overlay when sidebar is open */
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .activities-container {
             display: block;
-        }
-
-        .activities-section {
-            margin-bottom: 30px;
-        }
-
-        .activities-section h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-            font-weight: 600;
+            padding: 0;
         }
 
         .activity-group {
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 100%;
             margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-shrink: 0;
         }
 
         .activity-group-header {
             font-weight: 600;
             color: #495057;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-size: 0.9em;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -119,31 +181,30 @@
 
         .group-actions {
             display: flex;
-            gap: 5px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .activity-group:hover .group-actions {
-            opacity: 1;
+            gap: 8px;
         }
 
         .edit-btn, .delete-btn, .add-btn {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 4px;
-            border-radius: 3px;
-            font-size: 12px;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 14px;
             transition: background-color 0.2s;
+            min-height: 44px;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .edit-btn:hover {
+        .edit-btn:hover, .edit-btn:active {
             background: #007bff;
             color: white;
         }
 
-        .delete-btn:hover {
+        .delete-btn:hover, .delete-btn:active {
             background: #dc3545;
             color: white;
         }
@@ -152,13 +213,14 @@
             background: #28a745;
             color: white;
             margin-top: 10px;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 0.8em;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.85em;
             width: 100%;
+            min-height: 48px;
         }
 
-        .add-btn:hover {
+        .add-btn:hover, .add-btn:active {
             background: #218838;
         }
 
@@ -166,15 +228,16 @@
             background: #667eea;
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
+            padding: 12px 20px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 0.9em;
-            width: 100%;
-            margin-top: 15px;
+            margin: 15px;
+            min-height: 48px;
+            width: calc(100% - 30px);
         }
 
-        .add-group-btn:hover {
+        .add-group-btn:hover, .add-group-btn:active {
             background: #5a6fd8;
         }
 
@@ -183,16 +246,17 @@
             color: white;
             padding: 12px 15px;
             margin: 8px 0;
-            border-radius: 8px;
-            cursor: grab;
+            border-radius: 10px;
+            cursor: pointer;
             font-size: 0.95em;
             transition: transform 0.2s, box-shadow 0.2s;
             user-select: none;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            min-height: 44px; /* iOS recommended touch target */
+            min-height: 48px;
             touch-action: manipulation;
+            position: relative;
         }
 
         .activity-content {
@@ -204,175 +268,259 @@
 
         .activity-name {
             flex: 1;
+            font-weight: 500;
         }
 
         .activity-score {
             font-size: 0.8em;
-            opacity: 0.8;
+            opacity: 0.9;
             margin-left: 8px;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
         }
 
         .activity-actions {
             display: flex;
-            gap: 3px;
-            opacity: 0;
-            transition: opacity 0.2s;
-            margin-left: 8px;
-        }
-
-        .activity-item:hover .activity-actions {
-            opacity: 1;
+            gap: 5px;
+            margin-left: 10px;
         }
 
         .activity-edit-btn, .activity-delete-btn {
             background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
-            border-radius: 3px;
-            width: 20px;
-            height: 20px;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
             cursor: pointer;
-            font-size: 10px;
+            font-size: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+            min-height: 44px;
+            min-width: 44px;
         }
 
-        .activity-edit-btn:hover {
+        .activity-edit-btn:hover, .activity-edit-btn:active {
             background: rgba(255, 255, 255, 0.3);
         }
 
-        .activity-delete-btn:hover {
+        .activity-delete-btn:hover, .activity-delete-btn:active {
             background: rgba(220, 53, 69, 0.8);
         }
 
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
+        /* Dragging feedback */
+        .activity-item.dragging {
+            transform: scale(1.05);
+            opacity: 0.8;
             z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
         }
 
-        .modal-content {
-            background-color: white;
-            margin: 15% auto;
-            padding: 30px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-header {
+        /* Main dashboard area */
+        .main-dashboard {
+            flex: 1;
+            padding: 15px;
+            min-height: 0;
+            overflow: hidden;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #e9ecef;
+            flex-direction: column;
         }
 
-        .modal-title {
-            font-size: 1.3em;
-            font-weight: 600;
+        .dashboard-header {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .dashboard-header h2 {
+            color: #2c3e50;
+            font-size: 1.4em;
+            text-align: center;
+        }
+
+        .view-toggle {
+            display: none; /* Hidden on mobile - daily view only */
+            background: #e9ecef;
+            border-radius: 25px;
+            padding: 4px;
+            justify-content: center;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 20px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 0.9em;
+            min-height: 48px;
+        }
+
+        .toggle-btn.active {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             color: #2c3e50;
         }
 
-        .close {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .close:hover {
-            color: #000;
-        }
-
-        .form-group {
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
             margin-bottom: 20px;
+            flex-shrink: 0;
         }
 
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #495057;
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 4px solid #667eea;
         }
 
-        .form-input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
-            transition: border-color 0.2s;
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
         }
 
-        .form-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.8em;
         }
 
-        .modal-actions {
+        /* Calendar views */
+        .calendar-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            flex: 1;
+            min-height: 0;
             display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 25px;
+            flex-direction: column;
         }
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: background-color 0.2s;
+        .calendar-header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex-shrink: 0;
         }
 
-        .btn-primary {
+        .week-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .nav-btn {
             background: #667eea;
             color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            min-height: 48px;
+            min-width: 48px;
         }
 
-        .btn-primary:hover {
+        .nav-btn:hover, .nav-btn:active {
             background: #5a6fd8;
         }
 
-        .btn-secondary {
-            background: #6c757d;
+        .current-week {
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        /* Mobile-optimized calendar */
+        .calendar-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 15px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            flex: 1;
+        }
+
+        .day-cell {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            min-height: 120px;
+            transition: all 0.2s;
+        }
+
+        .day-cell.drag-over {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            transform: scale(1.02);
+        }
+
+        .day-header-mobile {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .day-date-mobile {
+            background: #667eea;
             color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.8em;
         }
 
-        .btn-secondary:hover {
-            background: #5a6268;
+        .day-header {
+            display: none; /* Hidden on mobile by default */
         }
 
-        /* Activity Status Styles */
+        .day-activities {
+            min-height: 80px;
+        }
+
         .day-activity {
-            background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
-            color: #333;
-            padding: 8px 12px;
-            margin: 4px 0;
-            border-radius: 6px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 10px 12px;
+            margin: 6px 0;
+            border-radius: 8px;
             font-size: 0.85em;
             position: relative;
             cursor: pointer;
             border: 2px solid transparent;
-            min-height: 40px; /* Touch-friendly */
+            min-height: 48px;
             touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .day-activity.completed {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
             border-color: #155724;
         }
 
@@ -382,9 +530,8 @@
             border-color: #856404;
         }
 
-        .day-activity:hover {
-            opacity: 0.8;
-            transform: translateY(-1px);
+        .day-activity:active {
+            transform: scale(0.98);
         }
 
         .activity-content-wrapper {
@@ -422,85 +569,560 @@
 
         .activity-controls {
             display: flex;
-            gap: 3px;
-            opacity: 0;
-            transition: opacity 0.2s;
-            margin-left: 8px;
-        }
-
-        .day-activity:hover .activity-controls {
-            opacity: 1;
+            gap: 5px;
+            margin-left: 10px;
         }
 
         .control-btn {
             background: rgba(255,255,255,0.2);
             border: none;
             color: inherit;
-            border-radius: 4px;
-            width: 32px;
-            height: 32px;
+            border-radius: 6px;
+            width: 40px;
+            height: 40px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background-color 0.2s;
             touch-action: manipulation;
-            min-height: 44px; /* iOS touch target */
+            min-height: 44px;
             min-width: 44px;
         }
 
-        .control-btn:hover {
-            background: rgba(255,255,255,0.3);
+        .control-btn:active {
+            background: rgba(255,255,255,0.4);
         }
 
-        .complete-btn {
-            background: #28a745;
-            color: white;
+        /* Daily view */
+        .daily-view {
+            display: none;
         }
 
-        .complete-btn:hover {
-            background: #218838;
+        .daily-view.active {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
-        .note-indicator {
-            background: #007bff;
-            color: white;
-            border-radius: 50%;
-            width: 12px;
-            height: 12px;
-            font-size: 8px;
+        .daily-header {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .daily-date-picker {
             display: flex;
             align-items: center;
             justify-content: center;
-            position: absolute;
-            top: -2px;
-            right: -2px;
+            gap: 15px;
         }
 
-        /* Notes Modal */
-        .notes-modal .modal-content {
-            max-width: 600px;
+        .date-input {
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            min-height: 48px;
+            text-align: center;
+        }
+
+        .daily-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .daily-activities {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            min-height: 200px;
+        }
+
+        .daily-activities h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .drop-zone {
+            min-height: 150px;
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+        }
+
+        .drop-zone.drag-over {
+            border-color: #2196f3;
+            background: #e3f2fd;
+            color: #1976d2;
+            transform: scale(1.02);
+        }
+
+        .drop-zone.has-activities {
+            border: none;
+            background: transparent;
+            text-align: left;
+            padding: 0;
+            display: block;
+        }
+
+        /* Weekly view */
+        .weekly-view {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .weekly-view.active {
+            display: flex;
+        }
+
+        /* Empty state */
+        .empty-calendar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+            color: #6c757d;
+            min-height: 200px;
+        }
+
+        .empty-calendar-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* =========================
+           DESKTOP LAYOUT
+           ========================= */
+
+        @media (min-width: 1024px) {
+            .container {
+                height: calc(100vh - 40px);
+                max-width: none;
+            }
+
+            .header h1 {
+                font-size: 2.5em;
+            }
+
+            .header .subtitle {
+                font-size: 1.1em;
+            }
+
+            .main-content {
+                flex-direction: row !important;
+                height: 100%;
+            }
+
+            /* Desktop: Vertical sidebar - Fixed */
+            .master-activities {
+                width: 320px !important;
+                min-width: 320px !important;
+                max-width: 320px !important;
+                height: 100% !important;
+                max-height: none !important;
+                border-right: 1px solid #e9ecef !important;
+                border-bottom: none !important;
+                padding: 15px !important;
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                flex-shrink: 0 !important;
+                display: block !important;
+                visibility: visible !important;
+                background: #f8f9fa !important;
+            }
+
+            .activities-container {
+                display: block !important;
+                padding: 0 !important;
+                min-width: auto !important;
+            }
+
+            .activity-group {
+                min-width: auto !important;
+                width: 100% !important;
+                margin-bottom: 15px !important;
+                flex-shrink: 0 !important;
+            }
+
+            .add-group-btn {
+                width: 100% !important;
+                margin: 15px 0 0 0 !important;
+            }
+
+            /* Desktop: Main dashboard */
+            .main-dashboard {
+                flex: 1 !important;
+                padding: 20px !important;
+                min-width: 0 !important;
+                overflow: hidden !important;
+            }
+
+            .dashboard-header {
+                flex-direction: row !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+            }
+
+            .dashboard-header h2 {
+                text-align: left !important;
+                font-size: 1.8em !important;
+            }
+
+            .view-toggle {
+                width: auto !important;
+                justify-content: flex-end !important;
+            }
+
+            .toggle-btn {
+                flex: none !important;
+                min-width: 120px !important;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+                gap: 15px !important;
+                margin-bottom: 30px !important;
+            }
+
+            .stat-card {
+                padding: 20px !important;
+            }
+
+            .stat-number {
+                font-size: 2em !important;
+            }
+
+            .stat-label {
+                font-size: 0.9em !important;
+            }
+
+            /* Desktop: Grid calendar */
+            .calendar-grid {
+                display: grid !important;
+                grid-template-columns: repeat(7, 1fr) !important;
+                gap: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+                flex: 1 !important;
+                min-height: 0 !important;
+            }
+
+            .day-header {
+                display: block !important;
+                background: #f8f9fa !important;
+                padding: 15px 10px !important;
+                text-align: center !important;
+                font-weight: 600 !important;
+                color: #495057 !important;
+                border-bottom: 1px solid #e9ecef !important;
+            }
+
+            .day-cell {
+                min-height: 150px !important;
+                padding: 10px !important;
+                border-right: 1px solid #e9ecef !important;
+                border-bottom: 1px solid #e9ecef !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+                background: white !important;
+                border: 2px solid #e9ecef !important;
+            }
+
+            .day-cell:last-child {
+                border-right: none !important;
+            }
+
+            .day-header-mobile {
+                display: none !important;
+            }
+
+            .day-date {
+                display: block !important;
+                font-weight: 600 !important;
+                color: #495057 !important;
+                margin-bottom: 8px !important;
+                font-size: 0.9em !important;
+            }
+
+            .day-activities {
+                min-height: 100px !important;
+            }
+
+            .day-activity {
+                padding: 6px 10px !important;
+                margin: 3px 0 !important;
+                border-radius: 4px !important;
+                font-size: 0.8em !important;
+                min-height: auto !important;
+            }
+
+            .activity-controls {
+                opacity: 0 !important;
+                transition: opacity 0.2s !important;
+            }
+
+            .day-activity:hover .activity-controls {
+                opacity: 1 !important;
+            }
+
+            .control-btn {
+                width: 24px !important;
+                height: 24px !important;
+                min-width: 24px !important;
+                min-height: 24px !important;
+                font-size: 10px !important;
+            }
+
+            /* Desktop: Daily view adjustments */
+            .daily-content {
+                flex-direction: row !important;
+                gap: 30px !important;
+            }
+
+            .daily-activities {
+                flex: 1 !important;
+            }
+
+            .calendar-header {
+                flex-direction: row !important;
+                padding: 15px 20px !important;
+            }
+
+            .week-navigation {
+                justify-content: flex-start !important;
+            }
+
+            /* Desktop: Hide actions until hover */
+            .group-actions {
+                opacity: 0 !important;
+                transition: opacity 0.2s !important;
+            }
+
+            .activity-group:hover .group-actions {
+                opacity: 1 !important;
+            }
+
+            .activity-actions {
+                opacity: 0 !important;
+                transition: opacity 0.2s !important;
+            }
+
+            .activity-item:hover .activity-actions {
+                opacity: 1 !important;
+            }
+
+            /* Desktop: Hover states */
+            .activity-item:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+            }
+
+            .edit-btn:hover, .delete-btn:hover, .add-btn:hover, .add-group-btn:hover {
+                transform: translateY(-1px) !important;
+            }
+
+            /* Ensure calendar container is flexible */
+            .calendar-container {
+                display: flex !important;
+                flex-direction: column !important;
+                flex: 1 !important;
+                min-height: 0 !important;
+                overflow: hidden !important;
+            }
+
+            .weekly-view {
+                display: flex !important;
+                flex-direction: column !important;
+                flex: 1 !important;
+                min-height: 0 !important;
+            }
+
+            .weekly-view.active {
+                display: flex !important;
+            }
+        }
+
+        /* =========================
+           TABLET LAYOUT
+           ========================= */
+
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .activity-group {
+                min-width: 320px;
+            }
+
+            .calendar-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .day-header-mobile {
+                font-size: 1em;
+            }
+
+            .day-cell {
+                min-height: 180px;
+            }
+
+            /* Show both mobile header and activities */
+            .day-header {
+                display: none;
+            }
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .modal-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+            min-height: 44px;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close:hover, .close:active {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+            min-height: 48px;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
         }
 
         .form-textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
-            font-family: inherit;
             resize: vertical;
             min-height: 120px;
-            transition: border-color 0.2s;
+            font-family: inherit;
         }
 
-        .form-textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 25px;
         }
 
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s;
+            min-height: 48px;
+            min-width: 100px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover, .btn-primary:active {
+            background: #5a6fd8;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover, .btn-secondary:active {
+            background: #5a6268;
+        }
+
+        /* Status completion */
         .completion-section {
             background: #f8f9fa;
             padding: 15px;
@@ -516,14 +1138,18 @@
 
         .status-option {
             flex: 1;
-            padding: 10px;
+            padding: 15px;
             border: 2px solid #ddd;
-            border-radius: 5px;
+            border-radius: 8px;
             background: white;
             cursor: pointer;
             text-align: center;
             transition: all 0.2s;
             font-weight: 500;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .status-option.selected {
@@ -557,456 +1183,7 @@
             color: #28a745;
         }
 
-
-        .activity-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        .activity-item:active {
-            cursor: grabbing;
-        }
-
-        .main-dashboard {
-            flex: 1;
-            padding: 20px;
-            min-width: 0;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .view-toggle {
-            display: flex;
-            background: #e9ecef;
-            border-radius: 25px;
-            padding: 4px;
-        }
-
-        .toggle-btn {
-            padding: 8px 20px;
-            border: none;
-            border-radius: 20px;
-            background: transparent;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .toggle-btn.active {
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            color: #2c3e50;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            text-align: center;
-            border-left: 4px solid #667eea;
-        }
-
-        .stat-number {
-            font-size: 2em;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            color: #6c757d;
-            font-size: 0.9em;
-        }
-
-        .calendar-container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .calendar-header {
-            background: #f8f9fa;
-            padding: 15px 20px;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .week-navigation {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .nav-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-
-        .nav-btn:hover {
-            background: #5a6fd8;
-        }
-
-        .current-week {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-        }
-
-        .day-header {
-            background: #f8f9fa;
-            padding: 15px 10px;
-            text-align: center;
-            font-weight: 600;
-            color: #495057;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .day-cell {
-            min-height: 150px;
-            padding: 10px;
-            border-right: 1px solid #e9ecef;
-            border-bottom: 1px solid #e9ecef;
-            background: white;
-            transition: background-color 0.2s;
-        }
-
-        .day-cell:last-child {
-            border-right: none;
-        }
-
-        .day-cell.drag-over {
-            background: #e3f2fd;
-            border: 2px dashed #2196f3;
-        }
-
-        .day-date {
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 8px;
-            font-size: 0.9em;
-        }
-
-        .day-activities {
-            min-height: 100px;
-        }
-
-        .day-activity {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            padding: 6px 10px;
-            margin: 3px 0;
-            border-radius: 4px;
-            font-size: 0.8em;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .day-activity:hover {
-            opacity: 0.8;
-        }
-
-        .remove-btn {
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255,255,255,0.3);
-            border: none;
-            color: white;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            font-size: 10px;
-            cursor: pointer;
-            display: none;
-        }
-
-        .day-activity:hover .remove-btn {
-            display: block;
-        }
-
-        .daily-view {
-            display: none;
-        }
-
-        .daily-view.active {
-            display: block;
-        }
-
-        .daily-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .daily-date-picker {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .date-input {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-
-        .daily-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        .daily-activities {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 20px;
-            min-height: 400px;
-        }
-
-        .daily-activities h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .drop-zone {
-            min-height: 300px;
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            color: #6c757d;
-            transition: all 0.3s;
-        }
-
-        .drop-zone.drag-over {
-            border-color: #2196f3;
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .drop-zone.has-activities {
-            border: none;
-            background: transparent;
-            text-align: left;
-            padding: 0;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: env(safe-area-inset-top, 5px) env(safe-area-inset-right, 5px) env(safe-area-inset-bottom, 5px) env(safe-area-inset-left, 5px);
-            }
-
-            .main-content {
-                flex-direction: column;
-                min-height: auto;
-            }
-
-            .sidebar {
-                width: 100%;
-                max-height: 40vh;
-                border-right: none;
-                border-bottom: 1px solid #e9ecef;
-                padding: 10px;
-            }
-
-            .main-dashboard {
-                padding: 10px;
-            }
-
-            .header {
-                padding: 20px 15px;
-            }
-
-            .header h1 {
-                font-size: 2em;
-            }
-
-            .calendar-grid {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-
-            .day-cell {
-                min-height: 120px;
-                padding: 8px;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-                margin-bottom: 20px;
-            }
-
-            .stat-card {
-                padding: 15px;
-            }
-
-            .stat-number {
-                font-size: 1.8em;
-            }
-
-            .daily-content {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .modal-content {
-                margin: 10% auto;
-                width: 95%;
-                max-width: none;
-                padding: 20px;
-            }
-
-            .dashboard-header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: stretch;
-            }
-
-            .view-toggle {
-                justify-content: center;
-            }
-
-            .toggle-btn {
-                flex: 1;
-                padding: 12px 16px;
-            }
-
-            .calendar-header {
-                flex-direction: column;
-                gap: 15px;
-                padding: 15px;
-            }
-
-            .week-navigation {
-                justify-content: center;
-            }
-
-            .nav-btn {
-                padding: 10px 15px;
-                font-size: 0.95em;
-            }
-
-            /* Better touch targets */
-            .btn {
-                padding: 12px 24px;
-                font-size: 1em;
-                min-height: 48px;
-            }
-
-            .form-input, .form-textarea {
-                padding: 12px 15px;
-                font-size: 16px; /* Prevents zoom on iOS */
-            }
-
-            /* Hide weekly view calendar on very small screens */
-            @media (max-width: 480px) {
-                .calendar-grid {
-                    display: none;
-                }
-
-                .weekly-view::after {
-                    content: "📱 Weekly view hidden on small screens. Use Daily view instead.";
-                    display: block;
-                    padding: 40px 20px;
-                    text-align: center;
-                    color: #6c757d;
-                    background: white;
-                    border-radius: 10px;
-                    margin-top: 20px;
-                }
-            }
-        }
-
-        /* Desktop-first base styles - these should be the default */
-        .sidebar {
-            width: 300px !important;
-            min-width: 280px !important;
-            max-width: 300px !important;
-            max-height: none !important;
-            border-right: 1px solid #e9ecef !important;
-            border-bottom: none !important;
-            flex-shrink: 0 !important;
-            display: block !important;
-            order: 0 !important;
-        }
-
-        .main-content {
-            flex-direction: row !important;
-            display: flex !important;
-            min-height: 0 !important;
-            overflow: hidden !important;
-        }
-
-        .main-dashboard {
-            flex: 1 !important;
-            min-width: 0 !important;
-            overflow: hidden !important;
-            display: flex !important;
-            flex-direction: column !important;
-        }
-
-        .calendar-grid {
-            grid-template-columns: repeat(7, 1fr) !important;
-        }
-
-        .stats-grid {
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
-        }
-
-        .activity-controls {
-            opacity: 0;
-        }
-
-        .day-activity:hover .activity-controls {
-            opacity: 1;
-        }
-
-        .group-actions {
-            opacity: 0;
-        }
-
-        .activity-group:hover .group-actions {
-            opacity: 1;
-        }
-
-        /* PWA Install Banner */
+        /* PWA install banner */
         .install-banner {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
@@ -1031,18 +1208,40 @@
             background: white;
             color: #28a745;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 12px 20px;
+            border-radius: 8px;
             margin: 0 10px;
             cursor: pointer;
             font-weight: 600;
             touch-action: manipulation;
+            min-height: 44px;
         }
 
         .install-banner .close-banner {
             background: transparent;
             color: white;
-            border: 1px solid white;
+            border: 2px solid white;
+        }
+
+        /* Small mobile adjustments */
+        @media (max-width: 480px) {
+            .container {
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .activity-group {
+                min-width: 250px;
+            }
+
+            .modal-content {
+                margin: 5% auto;
+                width: 95%;
+            }
         }
     </style>
 </head>
@@ -1053,15 +1252,19 @@
             <div class="subtitle">Track your weekly progress and stay organized</div>
         </div>
 
+        <!-- Mobile sidebar toggle button -->
+        <button class="mobile-sidebar-toggle" id="mobileToggle" onclick="toggleMobileSidebar()">☰</button>
+
+        <!-- Mobile overlay -->
+        <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
+
         <div class="main-content">
-            <div class="sidebar">
-                <div class="activities-section">
-                    <h3>Master Activities</h3>
-                    <div id="activityGroups">
-                        <!-- Groups will be generated by JavaScript -->
-                    </div>
-                    <button class="add-group-btn" onclick="openGroupModal()">+ Add New Group</button>
+            <!-- Master activities - responsive layout -->
+            <div class="master-activities" id="masterActivities">
+                <div class="activities-container" id="activitiesContainer">
+                    <!-- Groups will be generated by JavaScript -->
                 </div>
+                <button class="add-group-btn" onclick="openGroupModal()">+ Add New Group</button>
             </div>
 
             <div class="main-dashboard">
@@ -1080,15 +1283,15 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="weeklyCompletedScore">0</div>
-                        <div class="stat-label">Weekly Score (Completed)</div>
+                        <div class="stat-label">Weekly Score</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="completedActivities">0</div>
-                        <div class="stat-label">Activities Completed</div>
+                        <div class="stat-label">Completed</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="scheduledActivities">0</div>
-                        <div class="stat-label">Activities Scheduled</div>
+                        <div class="stat-label">Scheduled</div>
                     </div>
                 </div>
 
@@ -1096,9 +1299,9 @@
                     <div class="calendar-container">
                         <div class="calendar-header">
                             <div class="week-navigation">
-                                <button class="nav-btn" onclick="previousWeek()">← Previous</button>
+                                <button class="nav-btn" onclick="previousWeek()">←</button>
                                 <div class="current-week" id="currentWeek">Current Week</div>
-                                <button class="nav-btn" onclick="nextWeek()">Next →</button>
+                                <button class="nav-btn" onclick="nextWeek()">→</button>
                             </div>
                             <button class="nav-btn" onclick="goToToday()">Today</button>
                         </div>
@@ -1238,7 +1441,7 @@
         let currentWeek = new Date();
         let activities = JSON.parse(localStorage.getItem('activities')) || {};
         let activityGroups = JSON.parse(localStorage.getItem('activityGroups')) || getDefaultGroups();
-        let currentView = 'weekly';
+        let currentView = 'daily'; // Default to daily for mobile
         let editingGroup = null;
         let editingActivity = { groupId: null, activityId: null };
         let editingScheduledActivity = { dateKey: null, activityIndex: null };
@@ -1247,10 +1450,54 @@
         let deferredPrompt;
         let isInstalled = false;
 
-        // Device detection variables
-        let deviceType = 'desktop';
+        // Device detection
+        let deviceType = 'mobile';
         let isTouchDevice = false;
-        let isStandalone = false;
+
+        // Touch drag variables
+        let touchItem = null;
+        let touchStartPos = { x: 0, y: 0 };
+        let isDragging = false;
+
+        // Mobile sidebar functions
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('masterActivities');
+            const overlay = document.getElementById('mobileOverlay');
+            const toggle = document.getElementById('mobileToggle');
+
+            if (sidebar.classList.contains('open')) {
+                closeMobileSidebar();
+            } else {
+                openMobileSidebar();
+            }
+        }
+
+        function openMobileSidebar() {
+            const sidebar = document.getElementById('masterActivities');
+            const overlay = document.getElementById('mobileOverlay');
+            const toggle = document.getElementById('mobileToggle');
+
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+            toggle.classList.add('open');
+            toggle.innerHTML = '×';
+
+            // Haptic feedback
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('masterActivities');
+            const overlay = document.getElementById('mobileOverlay');
+            const toggle = document.getElementById('mobileToggle');
+
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            toggle.classList.remove('open');
+            toggle.innerHTML = '☰';
+        }
 
         // Default activity groups
         function getDefaultGroups() {
@@ -1283,793 +1530,373 @@
                         'api-documentation': { name: 'API Documentation', score: 15 },
                         'process-documentation': { name: 'Process Documentation', score: 15 }
                     }
-                },
-                'learning': {
-                    name: 'Learning',
-                    defaultScore: 25,
-                    activities: {
-                        'research': { name: 'Research', score: 25 },
-                        'training': { name: 'Training', score: 25 },
-                        'skill-development': { name: 'Skill Development', score: 25 }
-                    }
                 }
             };
         }
 
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', function() {
-            detectDevice();
-            renderActivityGroups();
-            setupDragAndDrop();
-            generateCalendar();
-            updateStats();
-            setupModals();
-            initializePWA();
-            applyDeviceSpecificStyles();
-            optimizeForDevice();
-
-            // Set today's date in daily view
-            document.getElementById('dailyDate').value = new Date().toISOString().split('T')[0];
-
-            // Add resize listener to handle orientation changes
-            window.addEventListener('resize', handleDeviceChange);
-            window.addEventListener('orientationchange', handleDeviceChange);
-        });
-
-        function handleDeviceChange() {
-            setTimeout(() => {
-                const oldDeviceType = deviceType;
-                detectDevice();
-
-                // If device type changed (e.g., rotating tablet), re-apply styles
-                if (oldDeviceType !== deviceType) {
-                    console.log(`Device type changed from ${oldDeviceType} to ${deviceType}`);
-                    applyDeviceSpecificStyles();
-                    optimizeForDevice();
-                }
-            }, 100);
-        }
-
-        // Device Detection
+        // Device detection
         function detectDevice() {
-            // Check if it's a touch device
-            isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
-
-            // Check if running as standalone PWA
-            isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                          window.navigator.standalone === true;
-
-            // Get device information
             const width = window.innerWidth;
-            const height = window.innerHeight;
             const userAgent = navigator.userAgent.toLowerCase();
-            const platform = navigator.platform.toLowerCase();
 
-            // More accurate device detection
-            let detectedType = 'desktop'; // Default to desktop
+            // Check for touch capability
+            isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-            // First, check for explicit mobile/tablet indicators in user agent
-            const isMobileUA = /iphone|ipod|android(?!.*tablet)|blackberry|windows phone|webos|palm/i.test(userAgent);
-            const isTabletUA = /ipad|android(?=.*tablet)|kindle|silk|playbook|tablet/i.test(userAgent);
-
-            // Check for desktop/laptop indicators
+            // Check for desktop indicators
             const isDesktopUA = /windows nt|macintosh|linux(?!.*android)|cros/i.test(userAgent);
-            const isDesktopPlatform = /win|mac|linux/i.test(platform);
-
-            // Screen size thresholds (more conservative)
-            const isSmallScreen = width < 768;
-            const isMediumScreen = width >= 768 && width <= 1024;
-            const isLargeScreen = width > 1024;
-
-            // Check for mouse capability (stronger desktop indicator)
             const hasMouseCapability = window.matchMedia('(pointer: fine)').matches;
             const hasHoverCapability = window.matchMedia('(hover: hover)').matches;
 
-            // Debug information
-            console.log('Device Detection Debug:', {
-                width,
-                height,
-                userAgent,
-                platform,
-                isTouchDevice,
-                isMobileUA,
-                isTabletUA,
-                isDesktopUA,
-                isDesktopPlatform,
-                hasMouseCapability,
-                hasHoverCapability,
-                isSmallScreen,
-                isMediumScreen,
-                isLargeScreen
-            });
-
-            // Improved detection logic
-            if (isDesktopUA || isDesktopPlatform || hasMouseCapability || (!isTouchDevice && isLargeScreen)) {
-                // Strong desktop indicators
-                detectedType = 'desktop';
-            } else if (isMobileUA || (isTouchDevice && isSmallScreen && !isTabletUA)) {
-                // Clear mobile indicators
-                detectedType = 'mobile';
-            } else if (isTabletUA || (isTouchDevice && isMediumScreen)) {
-                // Tablet indicators
-                detectedType = 'tablet';
-            } else if (isTouchDevice && !hasMouseCapability && !hasHoverCapability) {
-                // Touch device without fine pointer control
-                if (isSmallScreen) {
-                    detectedType = 'mobile';
-                } else if (isMediumScreen) {
-                    detectedType = 'tablet';
-                } else {
-                    // Large touch screen - could be touch laptop or large tablet
-                    detectedType = isDesktopPlatform ? 'desktop' : 'tablet';
-                }
+            // Determine device type
+            if (width >= 1024 && (isDesktopUA || hasMouseCapability || hasHoverCapability)) {
+                deviceType = 'desktop';
+            } else if (width >= 768) {
+                deviceType = 'tablet';
             } else {
-                // Fallback to screen size
-                if (isLargeScreen) {
-                    detectedType = 'desktop';
-                } else if (isMediumScreen) {
-                    detectedType = 'tablet';
-                } else {
-                    detectedType = 'mobile';
-                }
+                deviceType = 'mobile';
             }
 
-            // Override for known desktop browsers on laptops/desktops
-            if ((userAgent.includes('chrome') || userAgent.includes('firefox') || userAgent.includes('safari')) &&
-                !userAgent.includes('mobile') && !userAgent.includes('tablet') &&
-                (isDesktopPlatform || width > 1024)) {
-                detectedType = 'desktop';
-            }
-
-            deviceType = detectedType;
-
-            // Remove old device classes
-            document.body.classList.remove('device-desktop', 'device-tablet', 'device-mobile', 'touch-device', 'standalone-app');
-
-            // Add device classes to body
-            document.body.classList.add(`device-${deviceType}`);
-            if (isTouchDevice) document.body.classList.add('touch-device');
-            if (isStandalone) document.body.classList.add('standalone-app');
-
-            console.log(`Device detected: ${deviceType}, Touch: ${isTouchDevice}, Standalone: ${isStandalone}`);
-
-            // Show device type indicator for debugging (temporary)
-            showDeviceDebugInfo();
-
-            // Force immediate layout application for desktop
-            if (deviceType === 'desktop') {
-                forceDesktopLayout();
-            }
-
-            // Set device-specific defaults
-            setDeviceDefaults();
+            console.log(`Device detected: ${deviceType}, Width: ${width}, Touch: ${isTouchDevice}`);
         }
 
-        function forceDesktopLayout() {
-            // Immediately apply desktop layout without waiting for CSS
-            const sidebar = document.querySelector('.sidebar');
-            const mainContent = document.querySelector('.main-content');
-            const mainDashboard = document.querySelector('.main-dashboard');
-            const calendarGrid = document.querySelector('.calendar-grid');
-            const container = document.querySelector('.container');
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('App initializing...');
 
-            if (container) {
-                container.style.height = 'calc(100vh - 40px)';
-                container.style.display = 'flex';
-                container.style.flexDirection = 'column';
-                container.style.overflow = 'hidden';
-            }
+            detectDevice();
+            console.log('Device detection complete');
 
-            if (sidebar) {
-                sidebar.style.width = '300px';
-                sidebar.style.minWidth = '280px';
-                sidebar.style.maxWidth = '300px';
-                sidebar.style.maxHeight = 'none';
-                sidebar.style.borderRight = '1px solid #e9ecef';
-                sidebar.style.borderBottom = 'none';
-                sidebar.style.display = 'block';
-                sidebar.style.order = '0';
-                sidebar.style.flexShrink = '0';
-            }
+            // Force render activities first
+            console.log('Rendering activity groups...');
+            renderActivityGroups();
 
-            if (mainContent) {
-                mainContent.style.flexDirection = 'row';
-                mainContent.style.display = 'flex';
-                mainContent.style.flex = '1';
-                mainContent.style.minHeight = '0';
-                mainContent.style.overflow = 'hidden';
-            }
-
-            if (mainDashboard) {
-                mainDashboard.style.flex = '1';
-                mainDashboard.style.minWidth = '0';
-                mainDashboard.style.overflow = 'hidden';
-                mainDashboard.style.display = 'flex';
-                mainDashboard.style.flexDirection = 'column';
-            }
-
-            if (calendarGrid) {
-                calendarGrid.style.gridTemplateColumns = 'repeat(7, 1fr)';
-            }
-
-            // Make calendar container flexible
-            const calendarContainer = document.querySelector('.calendar-container');
-            if (calendarContainer) {
-                calendarContainer.style.flex = '1';
-                calendarContainer.style.minHeight = '0';
-                calendarContainer.style.display = 'flex';
-                calendarContainer.style.flexDirection = 'column';
-            }
-
-            // Make weekly view flexible
-            const weeklyView = document.querySelector('.weekly-view.active');
-            if (weeklyView) {
-                weeklyView.style.display = 'flex';
-                weeklyView.style.flexDirection = 'column';
-                weeklyView.style.height = '100%';
-                weeklyView.style.minHeight = '0';
-            }
-
-            console.log('Forced desktop layout applied with proper flex sizing');
-        }
-
-        // Temporary debug function to show detected device type
-        function showDeviceDebugInfo() {
-            // Remove existing debug info
-            const existingDebug = document.querySelector('.device-debug');
-            if (existingDebug) {
-                existingDebug.remove();
-            }
-
-            // Create debug info
-            const debugDiv = document.createElement('div');
-            debugDiv.className = 'device-debug';
-            debugDiv.style.cssText = `
-                position: fixed;
-                top: 10px;
-                right: 10px;
-                background: rgba(0,0,0,0.8);
-                color: white;
-                padding: 10px;
-                border-radius: 5px;
-                font-size: 12px;
-                z-index: 10000;
-                font-family: monospace;
-            `;
-
-            // Check if sidebar exists and is visible
-            const sidebar = document.querySelector('.sidebar');
-            const sidebarVisible = sidebar ? (
-                window.getComputedStyle(sidebar).display !== 'none' &&
-                window.getComputedStyle(sidebar).visibility !== 'hidden' &&
-                parseFloat(window.getComputedStyle(sidebar).width) > 0
-            ) : false;
-
-            debugDiv.innerHTML = `
-                Device: ${deviceType}<br>
-                Touch: ${isTouchDevice}<br>
-                Size: ${window.innerWidth}x${window.innerHeight}<br>
-                Sidebar: ${sidebarVisible ? 'Visible' : 'Hidden'}<br>
-                Activities: ${document.querySelectorAll('.activity-item').length}<br>
-                UA: ${navigator.userAgent.substring(0, 30)}...
-            `;
-
-            document.body.appendChild(debugDiv);
-
-            // Auto-remove after 8 seconds
+            // Add a small delay to ensure rendering
             setTimeout(() => {
-                if (debugDiv.parentNode) {
-                    debugDiv.remove();
+                console.log('Activities rendered, setting up interactions...');
+
+                // Setup appropriate drag and drop based on device
+                if (deviceType === 'desktop') {
+                    setupDesktopDragAndDrop();
+                } else {
+                    setupTouchDragAndDrop();
                 }
-            }, 8000);
-        }
 
-        function setDeviceDefaults() {
-            // Auto-switch to daily view on mobile if weekly view is cramped
-            if (deviceType === 'mobile' && window.innerWidth < 480) {
-                setTimeout(() => {
+                generateCalendar();
+                updateStats();
+                setupModals();
+                initializePWA();
+
+                // Set mobile-specific behavior
+                if (deviceType === 'mobile' || deviceType === 'tablet') {
+                    // Force daily view for mobile
+                    currentView = 'daily';
                     switchView('daily');
-                }, 100);
-            }
 
-            // Adjust sidebar behavior based on device
-            const sidebar = document.querySelector('.sidebar');
-            if (deviceType === 'mobile') {
-                sidebar.style.maxHeight = '35vh';
-            } else if (deviceType === 'tablet') {
-                sidebar.style.maxHeight = '50vh';
-            } else {
-                sidebar.style.maxHeight = 'none';
+                    // Hide mobile toggle button on desktop
+                    const mobileToggle = document.getElementById('mobileToggle');
+                    if (mobileToggle) {
+                        mobileToggle.style.display = 'flex';
+                    }
+                } else {
+                    // Desktop behavior
+                    currentView = 'weekly';
+
+                    // Hide mobile toggle button on desktop
+                    const mobileToggle = document.getElementById('mobileToggle');
+                    if (mobileToggle) {
+                        mobileToggle.style.display = 'none';
+                    }
+
+                    // Show view toggle on desktop
+                    const viewToggle = document.querySelector('.view-toggle');
+                    if (viewToggle) {
+                        viewToggle.style.display = 'flex';
+                    }
+                }
+
+                // Set today's date in daily view
+                document.getElementById('dailyDate').value = new Date().toISOString().split('T')[0];
+
+                // Add resize listener
+                window.addEventListener('resize', handleResize);
+
+                console.log('Universal Activity Tracker initialized successfully');
+
+                // Force show activities container
+                const activitiesContainer = document.getElementById('activitiesContainer');
+                if (activitiesContainer) {
+                    console.log('Activities container found:', activitiesContainer.children.length, 'groups');
+                } else {
+                    console.error('Activities container not found!');
+                }
+            }, 100);
+        });
+
+        function handleResize() {
+            const oldDeviceType = deviceType;
+            detectDevice();
+
+            if (oldDeviceType !== deviceType) {
+                console.log(`Device type changed from ${oldDeviceType} to ${deviceType}`);
+                generateCalendar(); // Regenerate calendar for new layout
             }
         }
 
-        function applyDeviceSpecificStyles() {
-            const head = document.head;
-
-            // Remove existing device styles
-            const existingDeviceStyles = document.querySelector('#device-specific-styles');
-            if (existingDeviceStyles) {
-                existingDeviceStyles.remove();
+        // Activity Groups Management - Enhanced
+        function renderActivityGroups() {
+            const container = document.getElementById('activitiesContainer');
+            if (!container) {
+                console.error('Activities container not found!');
+                return;
             }
 
-            const deviceStyles = document.createElement('style');
-            deviceStyles.id = 'device-specific-styles';
+            container.innerHTML = '';
+            console.log('Rendering activity groups:', Object.keys(activityGroups));
 
-            let css = '';
+            Object.entries(activityGroups).forEach(([groupId, group]) => {
+                console.log(`Rendering group: ${groupId}`, group);
 
-            if (deviceType === 'mobile') {
-                css += `
-                    /* Mobile-specific styles - Override defaults */
-                    .device-mobile .activity-controls {
-                        opacity: 1 !important;
-                        position: relative;
-                        margin-left: 8px;
-                    }
-
-                    .device-mobile .group-actions {
-                        opacity: 1 !important;
-                    }
-
-                    .device-mobile .main-content {
-                        flex-direction: column !important;
-                    }
-
-                    .device-mobile .sidebar {
-                        order: 1;
-                        width: 100% !important;
-                        border-right: none !important;
-                        border-bottom: 2px solid #e9ecef !important;
-                        max-height: 35vh !important;
-                    }
-
-                    .device-mobile .main-dashboard {
-                        order: 2;
-                        padding: 10px;
-                    }
-
-                    .device-mobile .calendar-grid {
-                        grid-template-columns: 1fr !important;
-                        gap: 8px;
-                    }
-
-                    .device-mobile .day-header {
-                        display: none;
-                    }
-
-                    .device-mobile .day-cell {
-                        border: 1px solid #ddd;
-                        border-radius: 8px;
-                        margin-bottom: 8px;
-                        padding: 12px;
-                    }
-
-                    .device-mobile .day-cell::before {
-                        content: attr(data-day-name) " " attr(data-day-date);
-                        font-weight: 600;
-                        color: #495057;
-                        display: block;
-                        margin-bottom: 8px;
-                        padding-bottom: 5px;
-                        border-bottom: 1px solid #e9ecef;
-                    }
-
-                    .device-mobile .day-date {
-                        display: none;
-                    }
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'activity-group';
+                groupDiv.innerHTML = `
+                    <div class="activity-group-header">
+                        <span class="group-name">${group.name}</span>
+                        <div class="group-actions">
+                            <button class="edit-btn" onclick="editGroup('${groupId}')" title="Edit Group">✏️</button>
+                            <button class="delete-btn" onclick="deleteGroup('${groupId}')" title="Delete Group">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="group-activities" id="group-${groupId}">
+                        ${renderGroupActivities(groupId, group.activities)}
+                    </div>
+                    <button class="add-btn" onclick="addActivity('${groupId}')">+ Add Activity</button>
                 `;
-            } else if (deviceType === 'tablet') {
-                css += `
-                    /* Tablet-specific styles */
-                    .device-tablet .stats-grid {
-                        grid-template-columns: repeat(2, 1fr) !important;
-                    }
-
-                    .device-tablet .sidebar {
-                        width: 280px !important;
-                        max-height: 60vh !important;
-                    }
-
-                    .device-tablet .calendar-grid {
-                        grid-template-columns: repeat(3, 1fr) !important;
-                        gap: 15px;
-                    }
-
-                    .device-tablet .day-cell {
-                        min-height: 180px;
-                    }
-
-                    .device-tablet .activity-controls {
-                        opacity: 1 !important;
-                    }
-
-                    .device-tablet .group-actions {
-                        opacity: 1 !important;
-                    }
-                `;
-            } else {
-                css += `
-                    /* Desktop-specific styles - Force desktop layout */
-                    .device-desktop .sidebar {
-                        width: 320px !important;
-                        max-height: none !important;
-                        border-right: 1px solid #e9ecef !important;
-                        border-bottom: none !important;
-                    }
-
-                    .device-desktop .main-content {
-                        flex-direction: row !important;
-                    }
-
-                    .device-desktop .calendar-grid {
-                        grid-template-columns: repeat(7, 1fr) !important;
-                    }
-
-                    .device-desktop .stats-grid {
-                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
-                    }
-
-                    .device-desktop .activity-controls {
-                        opacity: 0 !important;
-                    }
-
-                    .device-desktop .activity-item:hover .activity-controls {
-                        opacity: 1 !important;
-                    }
-
-                    .device-desktop .group-actions {
-                        opacity: 0 !important;
-                    }
-
-                    .device-desktop .activity-group:hover .group-actions {
-                        opacity: 1 !important;
-                    }
-
-                    .device-desktop .dashboard-header {
-                        flex-direction: row !important;
-                        align-items: center !important;
-                    }
-
-                    .device-desktop .calendar-header {
-                        flex-direction: row !important;
-                        padding: 15px 20px !important;
-                    }
-
-                    .device-desktop .week-navigation {
-                        justify-content: flex-start !important;
-                    }
-
-                    /* Ensure desktop layout even on smaller screens */
-                    .device-desktop .daily-content {
-                        grid-template-columns: 1fr 1fr !important;
-                    }
-                `;
-            }
-
-            // Touch device specific styles
-            if (isTouchDevice) {
-                css += `
-                    .touch-device .activity-item {
-                        cursor: default;
-                        min-height: 48px;
-                    }
-
-                    .touch-device .control-btn {
-                        width: 44px;
-                        height: 44px;
-                        min-width: 44px;
-                        min-height: 44px;
-                    }
-
-                    .touch-device .btn {
-                        min-height: 48px;
-                        padding: 12px 24px;
-                    }
-                `;
-            }
-
-            // Standalone app specific styles
-            if (isStandalone) {
-                css += `
-                    .standalone-app {
-                        padding-top: env(safe-area-inset-top, 20px);
-                        padding-bottom: env(safe-area-inset-bottom, 20px);
-                    }
-
-                    .standalone-app .install-banner {
-                        display: none !important;
-                    }
-                `;
-            }
-
-            deviceStyles.textContent = css;
-            head.appendChild(deviceStyles);
-
-            console.log(`Applied styles for device type: ${deviceType}`);
-        }
-
-        // PWA Functions
-        function initializePWA() {
-            // Register service worker
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('SW registered: ', registration);
-                    })
-                    .catch(registrationError => {
-                        console.log('SW registration failed: ', registrationError);
-                    });
-            }
-
-            // Handle PWA install prompt
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-
-                // Show install banner after 3 seconds if not already installed
-                setTimeout(() => {
-                    if (!isInstalled && !localStorage.getItem('installBannerDismissed')) {
-                        showInstallBanner();
-                    }
-                }, 3000);
+                container.appendChild(groupDiv);
             });
 
-            // Handle app installed
-            window.addEventListener('appinstalled', (evt) => {
-                console.log('App installed');
-                isInstalled = true;
-                hideInstallBanner();
+            console.log('Activity groups rendered. Container children:', container.children.length);
+
+            // Force visibility if hidden
+            if (container.style.display === 'none') {
+                container.style.display = 'flex';
+            }
+
+            const masterActivities = document.querySelector('.master-activities');
+            if (masterActivities && masterActivities.style.display === 'none') {
+                masterActivities.style.display = 'block';
+            }
+
+            // Force master activities container visibility
+            const masterContainer = document.querySelector('.master-activities');
+            if (masterContainer) {
+                masterContainer.style.display = 'block';
+                masterContainer.style.visibility = 'visible';
+                masterContainer.style.height = 'auto';
+                console.log('Master activities container made visible');
+            }
+        }
+
+        function renderGroupActivities(groupId, activities) {
+            return Object.entries(activities).map(([activityId, activity]) => `
+                <div class="activity-item"
+                     draggable="${deviceType === 'desktop'}"
+                     data-group="${groupId}"
+                     data-score="${activity.score}"
+                     data-activity="${activity.name}"
+                     data-activity-id="${activityId}">
+                    <div class="activity-content">
+                        <span class="activity-name">${activity.name}</span>
+                        <span class="activity-score">${activity.score}pts</span>
+                    </div>
+                    <div class="activity-actions">
+                        <button class="activity-edit-btn" onclick="editActivity('${groupId}', '${activityId}')" title="Edit">✏️</button>
+                        <button class="activity-delete-btn" onclick="deleteActivity('${groupId}', '${activityId}')" title="Delete">×</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Desktop drag and drop (HTML5)
+        function setupDesktopDragAndDrop() {
+            document.addEventListener('dragstart', function(e) {
+                if (e.target.closest('.activity-item')) {
+                    const item = e.target.closest('.activity-item');
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        activity: item.dataset.activity,
+                        group: item.dataset.group,
+                        score: parseInt(item.dataset.score)
+                    }));
+                    item.style.opacity = '0.5';
+                }
             });
 
-            // Check if app is already installed
-            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-                isInstalled = true;
-            }
+            document.addEventListener('dragend', function(e) {
+                if (e.target.closest('.activity-item')) {
+                    e.target.closest('.activity-item').style.opacity = '1';
+                }
+            });
 
-            // Add touch event optimizations
-            setupTouchOptimizations();
-        }
-
-        function showInstallBanner() {
-            const banner = document.getElementById('installBanner');
-            banner.classList.add('show');
-        }
-
-        function hideInstallBanner() {
-            const banner = document.getElementById('installBanner');
-            banner.classList.remove('show');
-        }
-
-        function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                        isInstalled = true;
-                    }
-                    deferredPrompt = null;
-                    hideInstallBanner();
-                });
-            } else {
-                // Fallback for browsers that don't support the install prompt
-                alert('To install this app:\n\n1. On iOS: Tap Share button → Add to Home Screen\n2. On Android: Tap menu → Add to Home Screen\n3. On Desktop: Look for install icon in address bar');
-                hideInstallBanner();
-            }
-        }
-
-        function dismissInstallBanner() {
-            hideInstallBanner();
-            localStorage.setItem('installBannerDismissed', 'true');
-        }
-
-        function setupTouchOptimizations() {
-            // Prevent double tap zoom on buttons
-            document.addEventListener('touchend', function(e) {
-                if (e.target.matches('button, .control-btn, .activity-item, .status-option')) {
+            document.addEventListener('dragover', function(e) {
+                const dropTarget = e.target.closest('.day-cell, .drop-zone');
+                if (dropTarget) {
                     e.preventDefault();
                 }
             });
 
-            // Device-specific drag and drop
-            if (deviceType === 'desktop') {
-                // Use standard HTML5 drag and drop for desktop
-                setupDragAndDrop();
-            } else {
-                // Use touch-based drag and drop for mobile/tablet
-                setupTouchDragAndDrop();
-            }
-        }
-
-        function setupTouchDragAndDrop() {
-            let touchItem = null;
-            let touchStartPos = { x: 0, y: 0 };
-            let isDragging = false;
-
-            document.addEventListener('touchstart', function(e) {
-                if (e.target.closest('.activity-item') && e.target.closest('.sidebar')) {
-                    touchItem = e.target.closest('.activity-item');
-                    touchStartPos = {
-                        x: e.touches[0].clientX,
-                        y: e.touches[0].clientY
-                    };
-                    isDragging = false;
-
-                    // Add visual feedback
-                    setTimeout(() => {
-                        if (touchItem) {
-                            touchItem.style.transform = 'scale(1.05)';
-                            touchItem.style.opacity = '0.8';
-                        }
-                    }, 100);
+            document.addEventListener('dragenter', function(e) {
+                const dropTarget = e.target.closest('.day-cell, .drop-zone');
+                if (dropTarget) {
+                    e.preventDefault();
+                    dropTarget.classList.add('drag-over');
                 }
             });
 
-            document.addEventListener('touchmove', function(e) {
-                if (touchItem) {
-                    const moveDistance = Math.abs(e.touches[0].clientX - touchStartPos.x) +
-                                      Math.abs(e.touches[0].clientY - touchStartPos.y);
+            document.addEventListener('dragleave', function(e) {
+                const dropTarget = e.target.closest('.day-cell, .drop-zone');
+                if (dropTarget && !dropTarget.contains(e.relatedTarget)) {
+                    dropTarget.classList.remove('drag-over');
+                }
+            });
 
-                    if (moveDistance > 10) {
-                        isDragging = true;
-                        e.preventDefault();
+            document.addEventListener('drop', function(e) {
+                const dropTarget = e.target.closest('.day-cell, .drop-zone');
+                if (dropTarget) {
+                    e.preventDefault();
+                    dropTarget.classList.remove('drag-over');
 
-                        // Show drop zones
-                        document.querySelectorAll('.day-cell').forEach(cell => {
-                            cell.classList.add('drop-zone-active');
-                        });
+                    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+
+                    let dateKey;
+                    if (dropTarget.classList.contains('day-cell')) {
+                        dateKey = dropTarget.dataset.dateKey;
+                    } else if (dropTarget.id === 'dailyDropZone') {
+                        dateKey = document.getElementById('dailyDate').value;
+                    }
+
+                    if (dateKey) {
+                        simulateDrop(data, dateKey);
                     }
                 }
             });
+        }
 
-            document.addEventListener('touchend', function(e) {
-                if (touchItem) {
-                    // Reset visual feedback
-                    touchItem.style.transform = '';
-                    touchItem.style.opacity = '';
+        // Touch-based drag and drop for mobile/tablet
+        function setupTouchDragAndDrop() {
+            document.addEventListener('touchstart', handleTouchStart, { passive: false });
+            document.addEventListener('touchmove', handleTouchMove, { passive: false });
+            document.addEventListener('touchend', handleTouchEnd, { passive: false });
+        }
 
-                    // Hide drop zones
-                    document.querySelectorAll('.day-cell').forEach(cell => {
-                        cell.classList.remove('drop-zone-active');
+        function handleTouchStart(e) {
+            const activityItem = e.target.closest('.activity-item');
+            if (activityItem && activityItem.closest('.master-activities')) {
+                touchItem = activityItem;
+                const touch = e.touches[0];
+                touchStartPos = {
+                    x: touch.clientX,
+                    y: touch.clientY
+                };
+                isDragging = false;
+
+                // Add haptic feedback if available
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+            }
+        }
+
+        function handleTouchMove(e) {
+            if (touchItem) {
+                const touch = e.touches[0];
+                const moveDistance = Math.abs(touch.clientX - touchStartPos.x) + Math.abs(touch.clientY - touchStartPos.y);
+
+                if (moveDistance > 15 && !isDragging) {
+                    isDragging = true;
+                    touchItem.classList.add('dragging');
+
+                    // Show drop zones
+                    document.querySelectorAll('.day-cell, .drop-zone').forEach(cell => {
+                        cell.classList.add('drag-over');
                     });
 
-                    if (isDragging) {
-                        const touchEndPos = {
-                            x: e.changedTouches[0].clientX,
-                            y: e.changedTouches[0].clientY
+                    // Prevent scrolling while dragging
+                    e.preventDefault();
+                }
+
+                if (isDragging) {
+                    e.preventDefault();
+
+                    // Update visual feedback during drag
+                    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                    const dropTarget = element?.closest('.day-cell, .drop-zone');
+
+                    document.querySelectorAll('.day-cell, .drop-zone').forEach(cell => {
+                        cell.classList.remove('drag-over');
+                    });
+
+                    if (dropTarget) {
+                        dropTarget.classList.add('drag-over');
+                    }
+                }
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (touchItem) {
+                // Reset visual feedback
+                touchItem.classList.remove('dragging');
+                document.querySelectorAll('.day-cell, .drop-zone').forEach(cell => {
+                    cell.classList.remove('drag-over');
+                });
+
+                if (isDragging) {
+                    const touch = e.changedTouches[0];
+                    const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+                    const dayCell = dropTarget?.closest('.day-cell');
+                    const dailyDropZone = dropTarget?.closest('#dailyDropZone');
+
+                    if (dayCell || dailyDropZone) {
+                        // Success haptic feedback
+                        if (navigator.vibrate) {
+                            navigator.vibrate([100, 50, 100]);
+                        }
+
+                        // Get activity data
+                        const data = {
+                            activity: touchItem.dataset.activity,
+                            group: touchItem.dataset.group,
+                            score: parseInt(touchItem.dataset.score)
                         };
 
-                        // Find drop target
-                        const dropTarget = document.elementFromPoint(touchEndPos.x, touchEndPos.y);
-                        const dayCell = dropTarget?.closest('.day-cell');
-
+                        let dateKey;
                         if (dayCell) {
-                            // Visual feedback for successful drop
-                            dayCell.style.background = '#e8f5e8';
-                            setTimeout(() => {
-                                dayCell.style.background = '';
-                            }, 300);
-
-                            // Simulate drop event
-                            const data = {
-                                activity: touchItem.dataset.activity,
-                                group: touchItem.dataset.group,
-                                score: parseInt(touchItem.dataset.score)
-                            };
-
-                            const dateKey = findDateKeyForDayCell(dayCell);
-                            if (dateKey) {
-                                simulateDrop(data, dateKey);
-                            }
-                        } else {
-                            // Show feedback that drop failed
-                            showToast('Drop on a day to add activity');
+                            dateKey = dayCell.dataset.dateKey;
+                        } else if (dailyDropZone) {
+                            dateKey = document.getElementById('dailyDate').value;
                         }
-                    }
 
-                    touchItem = null;
-                    isDragging = false;
+                        if (dateKey) {
+                            simulateDrop(data, dateKey);
+
+                            // Auto-close mobile sidebar after successful drop
+                            if (deviceType === 'mobile' || deviceType === 'tablet') {
+                                setTimeout(() => {
+                                    closeMobileSidebar();
+                                }, 500);
+                            }
+                        }
+                    } else {
+                        // Failed drop feedback
+                        if (navigator.vibrate) {
+                            navigator.vibrate(200);
+                        }
+                        showToast('Drop on a day to add activity');
+                    }
                 }
-            });
-        }
 
-        // Device-specific interaction optimizations
-        function optimizeForDevice() {
-            if (deviceType === 'mobile') {
-                // Mobile-specific optimizations
-
-                // Larger tap targets
-                const style = document.createElement('style');
-                style.textContent = `
-                    .device-mobile .control-btn {
-                        width: 48px !important;
-                        height: 48px !important;
-                        font-size: 14px !important;
-                    }
-
-                    .device-mobile .day-cell.drop-zone-active {
-                        border: 2px dashed #007bff;
-                        background: rgba(0, 123, 255, 0.1);
-                    }
-                `;
-                document.head.appendChild(style);
-
-                // Haptic feedback (if supported)
-                window.vibrate = window.vibrate || window.webkitVibrate || window.mozVibrate || window.msVibrate;
-
-            } else if (deviceType === 'tablet') {
-                // Tablet-specific optimizations
-
-                // Medium tap targets
-                const style = document.createElement('style');
-                style.textContent = `
-                    .device-tablet .calendar-grid {
-                        grid-template-columns: repeat(3, 1fr);
-                        gap: 12px;
-                    }
-                `;
-                document.head.appendChild(style);
-
-            } else {
-                // Desktop-specific optimizations
-
-                // Enable keyboard shortcuts for desktop
-                setupKeyboardShortcuts();
+                touchItem = null;
+                isDragging = false;
             }
-        }
-
-        function setupKeyboardShortcuts() {
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey || e.metaKey) {
-                    switch(e.key) {
-                        case 'w':
-                            e.preventDefault();
-                            switchView('weekly');
-                            break;
-                        case 'd':
-                            e.preventDefault();
-                            switchView('daily');
-                            break;
-                        case 'n':
-                            e.preventDefault();
-                            openGroupModal();
-                            break;
-                    }
-                }
-            });
-        }
-
-        // Device-aware notifications
-        function showDeviceAppropriateToast(message, type = 'success') {
-            if (deviceType === 'mobile' && window.vibrate) {
-                // Add haptic feedback for mobile
-                if (type === 'success') {
-                    window.vibrate([50]);
-                } else if (type === 'error') {
-                    window.vibrate([100, 50, 100]);
-                }
-            }
-
-            showToast(message);
-        }
-
-        function findDateKeyForDayCell(dayCell) {
-            // Extract date from day cell structure
-            const dateDiv = dayCell.querySelector('.day-date');
-            if (dateDiv) {
-                const dayNumber = parseInt(dateDiv.textContent);
-                const startOfWeek = new Date(currentWeek);
-                startOfWeek.setDate(currentWeek.getDate() - currentWeek.getDay());
-
-                // Find matching day
-                for (let i = 0; i < 7; i++) {
-                    const date = new Date(startOfWeek);
-                    date.setDate(startOfWeek.getDate() + i);
-                    if (date.getDate() === dayNumber) {
-                        return date.toISOString().split('T')[0];
-                    }
-                }
-            }
-            return null;
         }
 
         function simulateDrop(data, dateKey) {
@@ -2098,76 +1925,160 @@
                     loadDailyView();
                 }
 
-                // Show success feedback
-                showDeviceAppropriateToast('Activity added successfully!');
+                showToast('Activity added successfully!');
+            } else {
+                showToast('Activity already exists for this day');
             }
         }
 
-        function showToast(message) {
-            // Simple toast notification
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #28a745;
-                color: white;
-                padding: 12px 20px;
-                border-radius: 5px;
-                z-index: 10000;
-                font-size: 14px;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            `;
-            toast.textContent = message;
-            document.body.appendChild(toast);
+        // Calendar generation - responsive
+        function generateCalendar() {
+            const grid = document.getElementById('calendarGrid');
 
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
+            if (deviceType === 'desktop') {
+                generateDesktopCalendar(grid);
+            } else {
+                generateMobileCalendar(grid);
+            }
+
+            updateWeekDisplay();
         }
 
-        // Activity Groups Management
-        function renderActivityGroups() {
-            const container = document.getElementById('activityGroups');
-            container.innerHTML = '';
+        function generateDesktopCalendar(grid) {
+            grid.innerHTML = '';
 
-            Object.entries(activityGroups).forEach(([groupId, group]) => {
-                const groupDiv = document.createElement('div');
-                groupDiv.className = 'activity-group';
-                groupDiv.innerHTML = `
-                    <div class="activity-group-header">
-                        <span class="group-name">${group.name}</span>
-                        <div class="group-actions">
-                            <button class="edit-btn" onclick="editGroup('${groupId}')" title="Edit Group">✏️</button>
-                            <button class="delete-btn" onclick="deleteGroup('${groupId}')" title="Delete Group">🗑️</button>
+            // Add day headers
+            const dayHeaders = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'day-header';
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+
+            // Get start of week (Sunday)
+            const startOfWeek = new Date(currentWeek);
+            startOfWeek.setDate(currentWeek.getDate() - currentWeek.getDay());
+
+            // Generate 7 days
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(startOfWeek);
+                date.setDate(startOfWeek.getDate() + i);
+                const dayCell = createDesktopDayCell(date);
+                grid.appendChild(dayCell);
+            }
+        }
+
+        function generateMobileCalendar(grid) {
+            grid.innerHTML = '';
+
+            // Get start of week (Sunday)
+            const startOfWeek = new Date(currentWeek);
+            startOfWeek.setDate(currentWeek.getDate() - currentWeek.getDay());
+
+            // Generate 7 days in mobile-friendly format
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(startOfWeek);
+                date.setDate(startOfWeek.getDate() + i);
+                const dayCell = createMobileDayCell(date);
+                grid.appendChild(dayCell);
+            }
+        }
+
+        function createDesktopDayCell(date) {
+            const dayCell = document.createElement('div');
+            dayCell.className = 'day-cell';
+            const dateKey = date.toISOString().split('T')[0];
+
+            dayCell.dataset.dateKey = dateKey;
+
+            const dayDate = document.createElement('div');
+            dayDate.className = 'day-date';
+            dayDate.textContent = date.getDate();
+
+            const dayActivities = document.createElement('div');
+            dayActivities.className = 'day-activities';
+
+            // Add existing activities
+            if (activities[dateKey]) {
+                activities[dateKey].forEach((activity, index) => {
+                    const activityDiv = createActivityElement(activity, dateKey, index);
+                    dayActivities.appendChild(activityDiv);
+                });
+            }
+
+            dayCell.appendChild(dayDate);
+            dayCell.appendChild(dayActivities);
+
+            return dayCell;
+        }
+
+        function createMobileDayCell(date) {
+            const dayCell = document.createElement('div');
+            dayCell.className = 'day-cell';
+            const dateKey = date.toISOString().split('T')[0];
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+            // Store date key for drop functionality
+            dayCell.dataset.dateKey = dateKey;
+
+            const dayHeaderMobile = document.createElement('div');
+            dayHeaderMobile.className = 'day-header-mobile';
+            dayHeaderMobile.innerHTML = `
+                <span>${dayNames[date.getDay()]}</span>
+                <span class="day-date-mobile">${date.getDate()}</span>
+            `;
+
+            const dayActivities = document.createElement('div');
+            dayActivities.className = 'day-activities';
+
+            // Add existing activities
+            if (activities[dateKey] && activities[dateKey].length > 0) {
+                activities[dateKey].forEach((activity, index) => {
+                    const activityDiv = createActivityElement(activity, dateKey, index);
+                    dayActivities.appendChild(activityDiv);
+                });
+            } else {
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-calendar';
+                emptyState.innerHTML = `
+                    <div class="empty-calendar-icon">📋</div>
+                    <div>Drag activities here</div>
+                `;
+                dayActivities.appendChild(emptyState);
+            }
+
+            dayCell.appendChild(dayHeaderMobile);
+            dayCell.appendChild(dayActivities);
+
+            return dayCell;
+        }
+
+        function createActivityElement(activity, dateKey, index) {
+            const activityDiv = document.createElement('div');
+            activityDiv.className = `day-activity ${activity.status || 'scheduled'}`;
+
+            const hasNotes = activity.notes && activity.notes.trim().length > 0;
+            const displayScore = activity.status === 'completed' ? activity.actualScore : activity.score;
+
+            activityDiv.innerHTML = `
+                <div class="activity-content-wrapper">
+                    <div class="activity-info">
+                        <div class="activity-title">${activity.activity}</div>
+                        <div class="activity-meta">
+                            <span class="activity-status">${activity.status || 'scheduled'}</span>
+                            <span>${displayScore}pts</span>
                         </div>
                     </div>
-                    <div class="group-activities" id="group-${groupId}">
-                        ${renderGroupActivities(groupId, group.activities)}
-                    </div>
-                    <button class="add-btn" onclick="addActivity('${groupId}')">+ Add Activity</button>
-                `;
-                container.appendChild(groupDiv);
-            });
-        }
-
-        function renderGroupActivities(groupId, activities) {
-            return Object.entries(activities).map(([activityId, activity]) => `
-                <div class="activity-item" draggable="true"
-                     data-group="${groupId}"
-                     data-score="${activity.score}"
-                     data-activity="${activity.name}"
-                     data-activity-id="${activityId}">
-                    <div class="activity-content">
-                        <span class="activity-name">${activity.name}</span>
-                        <span class="activity-score">${activity.score}pts</span>
-                    </div>
-                    <div class="activity-actions">
-                        <button class="activity-edit-btn" onclick="editActivity('${groupId}', '${activityId}')" title="Edit">✏️</button>
-                        <button class="activity-delete-btn" onclick="deleteActivity('${groupId}', '${activityId}')" title="Delete">×</button>
+                    <div class="activity-controls">
+                        <button class="control-btn" onclick="openNotesModal('${dateKey}', ${index})" title="Edit Details">📝</button>
+                        <button class="control-btn" onclick="removeActivity('${dateKey}', ${index})" title="Remove">×</button>
                     </div>
                 </div>
-            `).join('');
+                ${hasNotes ? '<div class="note-indicator">💬</div>' : ''}
+            `;
+
+            return activityDiv;
         }
 
         // Modal Management
@@ -2268,7 +2179,6 @@
 
             saveActivityGroups();
             renderActivityGroups();
-            setupDragAndDrop();
             closeModal('groupModal');
         }
 
@@ -2290,7 +2200,6 @@
 
             saveActivityGroups();
             renderActivityGroups();
-            setupDragAndDrop();
             closeModal('activityModal');
         }
 
@@ -2303,7 +2212,6 @@
                 delete activityGroups[groupId];
                 saveActivityGroups();
                 renderActivityGroups();
-                setupDragAndDrop();
             }
         }
 
@@ -2321,7 +2229,6 @@
                 delete activityGroups[groupId].activities[activityId];
                 saveActivityGroups();
                 renderActivityGroups();
-                setupDragAndDrop();
             }
         }
 
@@ -2398,166 +2305,6 @@
             closeModal('notesModal');
         }
 
-        // Drag and drop functionality
-        function setupDragAndDrop() {
-            const activityItems = document.querySelectorAll('.activity-item');
-
-            activityItems.forEach(item => {
-                item.addEventListener('dragstart', function(e) {
-                    e.dataTransfer.setData('text/plain', JSON.stringify({
-                        activity: this.dataset.activity,
-                        group: this.dataset.group,
-                        score: parseInt(this.dataset.score)
-                    }));
-                    this.style.opacity = '0.5';
-                });
-
-                item.addEventListener('dragend', function() {
-                    this.style.opacity = '1';
-                });
-            });
-        }
-
-        function allowDrop(e) {
-            e.preventDefault();
-        }
-
-        function dragEnter(e) {
-            e.preventDefault();
-            e.target.classList.add('drag-over');
-        }
-
-        function dragLeave(e) {
-            e.target.classList.remove('drag-over');
-        }
-
-        function drop(e, dateKey) {
-            e.preventDefault();
-            e.target.classList.remove('drag-over');
-
-            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-
-            if (!activities[dateKey]) {
-                activities[dateKey] = [];
-            }
-
-            // Check if activity already exists for this day
-            const exists = activities[dateKey].some(activity => activity.activity === data.activity);
-            if (!exists) {
-                // Add activity as scheduled by default
-                const newActivity = {
-                    ...data,
-                    status: 'scheduled',
-                    actualScore: data.score,
-                    notes: '',
-                    timestamp: new Date().toISOString()
-                };
-
-                activities[dateKey].push(newActivity);
-                saveActivities();
-                generateCalendar();
-                updateStats();
-
-                if (currentView === 'daily') {
-                    loadDailyView();
-                }
-            }
-        }
-
-        // Calendar generation
-        function generateCalendar() {
-            const grid = document.getElementById('calendarGrid');
-            grid.innerHTML = '';
-
-            // Add day headers
-            const dayHeaders = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            dayHeaders.forEach(day => {
-                const header = document.createElement('div');
-                header.className = 'day-header';
-                header.textContent = day;
-                grid.appendChild(header);
-            });
-
-            // Get start of week (Sunday)
-            const startOfWeek = new Date(currentWeek);
-            startOfWeek.setDate(currentWeek.getDate() - currentWeek.getDay());
-
-            // Generate 7 days
-            for (let i = 0; i < 7; i++) {
-                const date = new Date(startOfWeek);
-                date.setDate(startOfWeek.getDate() + i);
-
-                const dayCell = createDayCell(date);
-                grid.appendChild(dayCell);
-            }
-
-            updateWeekDisplay();
-        }
-
-        function createDayCell(date) {
-            const dayCell = document.createElement('div');
-            dayCell.className = 'day-cell';
-
-            const dateKey = date.toISOString().split('T')[0];
-            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-            // Add data attributes for mobile styling
-            dayCell.setAttribute('data-day-name', dayNames[date.getDay()]);
-            dayCell.setAttribute('data-day-date', date.getDate());
-
-            dayCell.addEventListener('dragover', allowDrop);
-            dayCell.addEventListener('dragenter', dragEnter);
-            dayCell.addEventListener('dragleave', dragLeave);
-            dayCell.addEventListener('drop', (e) => drop(e, dateKey));
-
-            const dayDate = document.createElement('div');
-            dayDate.className = 'day-date';
-            dayDate.textContent = date.getDate();
-
-            const dayActivities = document.createElement('div');
-            dayActivities.className = 'day-activities';
-
-            // Add existing activities
-            if (activities[dateKey]) {
-                activities[dateKey].forEach((activity, index) => {
-                    const activityDiv = createActivityElement(activity, dateKey, index);
-                    dayActivities.appendChild(activityDiv);
-                });
-            }
-
-            dayCell.appendChild(dayDate);
-            dayCell.appendChild(dayActivities);
-
-            return dayCell;
-        }
-
-        function createActivityElement(activity, dateKey, index) {
-            const activityDiv = document.createElement('div');
-            activityDiv.className = `day-activity ${activity.status || 'scheduled'}`;
-
-            const hasNotes = activity.notes && activity.notes.trim().length > 0;
-            const displayScore = activity.status === 'completed' ? activity.actualScore : activity.score;
-
-            activityDiv.innerHTML = `
-                <div class="activity-content-wrapper">
-                    <div class="activity-info">
-                        <div class="activity-title">${activity.activity}</div>
-                        <div class="activity-meta">
-                            <span class="activity-status">${activity.status || 'scheduled'}</span>
-                            <span>${displayScore}pts</span>
-                        </div>
-                    </div>
-                    <div class="activity-controls">
-                        <button class="control-btn" onclick="openNotesModal('${dateKey}', ${index})" title="Edit Details">📝</button>
-                        <button class="control-btn" onclick="removeActivity('${dateKey}', ${index})" title="Remove">×</button>
-                    </div>
-                </div>
-                ${hasNotes ? '<div class="note-indicator">💬</div>' : ''}
-            `;
-
-            return activityDiv;
-        }
-
         function removeActivity(dateKey, index) {
             activities[dateKey].splice(index, 1);
             if (activities[dateKey].length === 0) {
@@ -2599,20 +2346,34 @@
             document.getElementById('currentWeek').textContent = weekText;
         }
 
-        // View switching
+        // View switching - Fixed
         function switchView(view) {
             currentView = view;
 
+            // Get the clicked button properly
+            const clickedButton = document.querySelector(`.toggle-btn[onclick="switchView('${view}')"]`);
+
             document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            if (clickedButton) {
+                clickedButton.classList.add('active');
+            }
+
+            const weeklyView = document.querySelector('.weekly-view');
+            const dailyView = document.querySelector('.daily-view');
 
             if (view === 'weekly') {
-                document.querySelector('.weekly-view').classList.add('active');
-                document.querySelector('.daily-view').classList.remove('active');
+                weeklyView.classList.add('active');
+                dailyView.classList.remove('active');
+                weeklyView.style.display = 'flex';
+                dailyView.style.display = 'none';
+                console.log('Switched to weekly view');
             } else {
-                document.querySelector('.weekly-view').classList.remove('active');
-                document.querySelector('.daily-view').classList.add('active');
+                weeklyView.classList.remove('active');
+                dailyView.classList.add('active');
+                weeklyView.style.display = 'none';
+                dailyView.style.display = 'flex';
                 loadDailyView();
+                console.log('Switched to daily view');
             }
         }
 
@@ -2621,12 +2382,6 @@
             const selectedDate = document.getElementById('dailyDate').value;
             const dropZone = document.getElementById('dailyDropZone');
             const summary = document.getElementById('dailySummary');
-
-            // Setup drop zone
-            dropZone.addEventListener('dragover', allowDrop);
-            dropZone.addEventListener('dragenter', dragEnter);
-            dropZone.addEventListener('dragleave', dragLeave);
-            dropZone.addEventListener('drop', (e) => drop(e, selectedDate));
 
             // Clear and populate activities
             if (activities[selectedDate] && activities[selectedDate].length > 0) {
@@ -2663,7 +2418,6 @@
 
             dayActivities.forEach(activity => {
                 const status = activity.status || 'scheduled';
-                const groupKey = `${activity.group}-${status}`;
 
                 if (!groupStats[activity.group]) {
                     groupStats[activity.group] = { scheduled: 0, completed: 0, scheduledScore: 0, completedScore: 0 };
@@ -2724,10 +2478,10 @@
             let totalCompletedActivities = 0;
             let totalScheduledActivities = 0;
 
-            currentWeekActivities.forEach(dayActivities => {
+            // Count all activities across all time
+            Object.values(activities).forEach(dayActivities => {
                 dayActivities.forEach(activity => {
                     if (activity.status === 'completed') {
-                        weeklyCompletedScore += activity.actualScore || activity.score;
                         totalCompletedActivities++;
                     } else {
                         totalScheduledActivities++;
@@ -2735,13 +2489,11 @@
                 });
             });
 
-            // Count all completed activities across all time
-            Object.values(activities).forEach(dayActivities => {
+            // Calculate weekly score from current week only
+            currentWeekActivities.forEach(dayActivities => {
                 dayActivities.forEach(activity => {
                     if (activity.status === 'completed') {
-                        totalCompletedActivities++;
-                    } else {
-                        totalScheduledActivities++;
+                        weeklyCompletedScore += activity.actualScore || activity.score;
                     }
                 });
             });
@@ -2765,6 +2517,102 @@
             }
 
             return weekActivities;
+        }
+
+        // PWA Functions
+        function initializePWA() {
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            }
+
+            // Handle PWA install prompt
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+
+                // Show install banner after 3 seconds if not already installed
+                setTimeout(() => {
+                    if (!isInstalled && !localStorage.getItem('installBannerDismissed')) {
+                        showInstallBanner();
+                    }
+                }, 3000);
+            });
+
+            // Handle app installed
+            window.addEventListener('appinstalled', (evt) => {
+                console.log('App installed');
+                isInstalled = true;
+                hideInstallBanner();
+            });
+
+            // Check if app is already installed
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+                isInstalled = true;
+            }
+        }
+
+        function showInstallBanner() {
+            const banner = document.getElementById('installBanner');
+            banner.classList.add('show');
+        }
+
+        function hideInstallBanner() {
+            const banner = document.getElementById('installBanner');
+            banner.classList.remove('show');
+        }
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                        isInstalled = true;
+                    }
+                    deferredPrompt = null;
+                    hideInstallBanner();
+                });
+            } else {
+                // Fallback for browsers that don't support the install prompt
+                alert('To install this app:\n\n1. On iOS: Tap Share button → Add to Home Screen\n2. On Android: Tap menu → Add to Home Screen\n3. On Desktop: Look for install icon in address bar');
+                hideInstallBanner();
+            }
+        }
+
+        function dismissInstallBanner() {
+            hideInstallBanner();
+            localStorage.setItem('installBannerDismissed', 'true');
+        }
+
+        function showToast(message) {
+            // Simple toast notification
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 10000;
+                font-size: 14px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                max-width: 300px;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
         }
 
         // Local storage
